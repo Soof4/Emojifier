@@ -23,22 +23,12 @@ namespace Emojifier
         #endregion
 
         public Emojifier(Main game) : base(game) { }
-        public static string configPath = Path.Combine(TShock.SavePath + "/EmojifierConfig.json");
-        Config config = new Config();
+        Configuration Config = new Configuration();
 
         public override void Initialize()
         {
             ServerApi.Hooks.ServerChat.Register(this, OnServerChat);
-            TShockAPI.Hooks.GeneralHooks.ReloadEvent += OnReload;
-
-            if (File.Exists(configPath))
-            {
-                config = Config.Read();
-            }
-            else
-            {
-                config.Write();
-            }
+            GeneralHooks.ReloadEvent += OnReload;
         }
 
         private void OnServerChat(ServerChatEventArgs args)
@@ -48,7 +38,7 @@ namespace Emojifier
             // Place the emojis
             if (text.Contains(':'))
             {
-                foreach (var kvp in config.Emojis)
+                foreach (var kvp in Config.Emojis)
                 {
                     text = text.Replace($":{kvp.Key}:", $"[i:{kvp.Value}]");
                 }
@@ -61,22 +51,17 @@ namespace Emojifier
 
         private void OnReload(ReloadEventArgs e)
         {
-            if (File.Exists(configPath))
-            {
-                config = Config.Read();
-            }
-            else
-            {
-                config.Write();
-            }
+            Config = Configuration.Reload();
         }
-        
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                TShockAPI.Hooks.GeneralHooks.ReloadEvent -= OnReload;
+                ServerApi.Hooks.ServerChat.Deregister(this, OnServerChat);
+                GeneralHooks.ReloadEvent -= OnReload;
             }
+
             base.Dispose(disposing);
         }
     }
