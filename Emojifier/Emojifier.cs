@@ -16,14 +16,14 @@ namespace Emojifier
         #region Plugin Info
 
         public override string Name => "Emojifier";
-        public override Version Version => new Version(1, 1, 0);
+        public override Version Version => new Version(1, 1, 1);
         public override string Author => "Soofa";
         public override string Description => "Emojis!";
 
         #endregion
 
         public Emojifier(Main game) : base(game) { }
-        Configuration Config = new Configuration();
+        Configuration Config = Configuration.Reload();
 
         public override void Initialize()
         {
